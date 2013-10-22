@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+TIMESTAMP=$(date +"%F")
+BACKUP_DIR="/tmp/dbs/$TIMESTAMP"
+MYSQL_USER="root"
+MYSQL_PASSWORD=""
+
+mkdir -p "$BACKUP_DIR/mysql"
+
+databases=`mysql --user=$MYSQL_USER -p$MYSQL_PASSWORD -e "SHOW DATABASES;" | grep -Ev "(Database|information_schema)"`
+
+for db in $databases; do
+    mysqldump --force --opt --user=$MYSQL_USER --databases $db | gzip > "$BACKUP_DIR/mysql/$db.sql.gz"
+done
